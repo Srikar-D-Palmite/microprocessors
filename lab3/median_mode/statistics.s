@@ -1,8 +1,8 @@
-	.file	"progression.c"
+	.file	"statistics.c"
 	.text
 	.section	.rodata
 .LC0:
-	.string	"sum of the progression = %ld\n"
+	.string	"median = %ld, mode=\n"
 	.text
 	.globl	main
 	.type	main, @function
@@ -15,19 +15,36 @@ main:
 	.cfi_offset 6, -16
 	movq	%rsp, %rbp
 	.cfi_def_cfa_register 6
-	subq	$16, %rsp
-	movq	$5, -16(%rbp)
-	movq	$3, -8(%rbp)
-	movq	-16(%rbp), %rdx
-	movq	-8(%rbp), %rax
+	subq	$96, %rsp
+	movq	%fs:40, %rax
+	movq	%rax, -8(%rbp)
+	xorl	%eax, %eax
+	movq	$8, -96(%rbp)
+	movq	$2, -80(%rbp)
+	movq	$4, -72(%rbp)
+	movq	$6, -64(%rbp)
+	movq	$8, -56(%rbp)
+	movq	$10, -48(%rbp)
+	movq	$16, -40(%rbp)
+	movq	$32, -32(%rbp)
+	movq	$64, -24(%rbp)
+	movq	-96(%rbp), %rdx
+	leaq	-80(%rbp), %rax
 	movq	%rdx, %rsi
 	movq	%rax, %rdi
-	call	seriesSum@PLT
+	call	median@PLT
+	movq	%rax, -88(%rbp)
+	movq	-88(%rbp), %rax
 	movq	%rax, %rsi
 	leaq	.LC0(%rip), %rdi
 	movl	$0, %eax
 	call	printf@PLT
 	movl	$0, %eax
+	movq	-8(%rbp), %rcx
+	xorq	%fs:40, %rcx
+	je	.L3
+	call	__stack_chk_fail@PLT
+.L3:
 	leave
 	.cfi_def_cfa 7, 8
 	ret
